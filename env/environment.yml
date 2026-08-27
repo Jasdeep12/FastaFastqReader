@@ -1,0 +1,8 @@
+name: fastafastqreader
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python
+prefix: /home/jazz/ENTER/envs/fastafastqreader
