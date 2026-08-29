@@ -34,6 +34,13 @@ class Sequence:
         gc_count = self.sequence.upper().count('G') + self.sequence.upper().count('C')
         return gc_count / len(self.sequence)
     
+    @property
+    def reverse_complement(self) -> str:
+        """Generate a reverse complement of a DNA sequence"""
+        complement_map = {'A' : 'T', 'T' : 'A', 'C' : 'G', 'G' : 'C'}
+        reversed_seq = self.sequence[::-1]
+        return ''.join(complement_map.get(base.upper(), 'N') for base in reversed_seq)
+    
     def __repr__(self) -> str:
         q_info = f", quality={len(self.quality)}bp" if self.quality else ""
         return f"Sequence({self.identifier}, {self.length}bp{q_info})"
