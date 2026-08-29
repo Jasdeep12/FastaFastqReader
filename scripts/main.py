@@ -13,7 +13,7 @@ def analyze_fasta(filepath):
     parser = FASTAParser(filepath)
     sequences = list(parser.parse())
     
-    print(f"Parsing FASTQ file @ {filepath}")
+    print(f"Parsing FASTA file @ {filepath}")
     print()
     
     stats = SequenceStats.length_stats(sequences)
