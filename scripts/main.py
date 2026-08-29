@@ -38,8 +38,9 @@ def analyze_fasta(filepath):
     
     stats = SequenceStats.composition_stats(sequences)
     print("-- Composition --")
-    for key, value in stats.items:
+    for key, value in stats.items():
         print(f"{key} : {value}")
+    print()
         
         
         
@@ -82,21 +83,25 @@ def analyze_fastq(filepath):
     
     stats = SequenceStats.composition_stats(sequences)
     print("-- Composition --")
-    for key, value in stats.items:
+    for key, value in stats.items():
         print(f"{key} : {value}")
+    print()
     
-    
-def filter_example():
-    parser = FASTAParser('fastaReader-project/test/test.fasta')
+def filter_example(filepath):
+    parser = FASTAParser(filepath)
     
     filtered = SequenceFilter.by_length(parser.parse(), min_length=100, max_length=500)
+    print("-- Filter Example --")
     for seq in filtered:
         print(seq)
     
 
 def main():
-    # """Main entry point for examples"""
-
+    """Main entry point for examples"""
+    example = 'test.fasta'
+    
+    analyze_fasta(example)
+    filter_example(example)
 
 
 if __name__ == "__main__":
