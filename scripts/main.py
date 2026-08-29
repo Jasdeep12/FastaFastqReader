@@ -13,6 +13,9 @@ def analyze_fasta(filepath):
     parser = FASTAParser(filepath)
     sequences = list(parser.parse())
     
+    print(f"Parsing FASTQ file @ {filepath}")
+    print()
+    
     stats = SequenceStats.length_stats(sequences)
     print("-- Length Statistics --")
     print(f"Total Sequences: {stats['count']}")
@@ -35,35 +38,66 @@ def analyze_fasta(filepath):
     
     stats = SequenceStats.composition_stats(sequences)
     print("-- Composition --")
-    for key, value in stats:
+    for key, value in stats.items:
         print(f"{key} : {value}")
+        
         
         
 def analyze_fastq(filepath):
     """Parse and analyze a FASTQ file"""
     
-    parser = FASTAParser(filepath)
+    parser = FASTQParser(filepath)
+    sequences = list(parser.parse())
     
+    print(f"Parsing FASTQ file @ {filepath}")
+    print()
     
+    stats = SequenceStats.length_stats(sequences)
+    print("-- Length Statistics --")
+    print(f"Total Sequences: {stats['count']}")
+    print(f"Average Length: {stats['mean']}")
+    print(f"Min Length: {stats['min']}")
+    print(f"Max Length: {stats['max']}")
+    print(f"Median Length: {stats['median']}")
+    print(f"Standard Deviation of Length: {stats['stdev']}")
+    print()
+    
+    stats = SequenceStats.gc_content_stats(sequences)
+    print("-- GC Content --")
+    print(f"Total Sequences: {stats['count']}")
+    print(f"Average GC Content: {stats['mean']}")
+    print(f"Min GC Content: {stats['min']}")
+    print(f"Max GC Content: {stats['max']}")
+    print(f"Median GC Content: {stats['median']}")
+    print(f"Standard Deviation of GC Content: {stats['stdev']}")
+    print()
+    
+    stats = SequenceStats.quality_stats(sequences)
+    print("-- Quality Stats --")
+    print(f"Total Sequences: {stats['count']}")
+    print(f"Average Quality: {stats['avg_quality']}")
+    print(f"Min Quality: {stats['min_quality']}")
+    print(f"Max Quality: {stats['max_quality']}")
+    print()
+    
+    stats = SequenceStats.composition_stats(sequences)
+    print("-- Composition --")
+    for key, value in stats.items:
+        print(f"{key} : {value}")
     
     
 def filter_example():
-    parser = FASTAParser('fastaReader-project/test/test.fasta')\
+    parser = FASTAParser('fastaReader-project/test/test.fasta')
     
     filtered = SequenceFilter.by_length(parser.parse(), min_length=100, max_length=500)
-    for seq in filterd:
+    for seq in filtered:
         print(seq)
     
 
-
-
-
-
 def main():
-    """Main entry point for examples"""
+    # """Main entry point for examples"""
 
 
 
-
-if __name__ = "__main__":
+if __name__ == "__main__":
     main()
