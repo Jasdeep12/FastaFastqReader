@@ -87,8 +87,12 @@ def analyze_fastq(filepath):
         print(f"{key} : {value}")
     print()
     
-def filter_example(filepath):
-    parser = FASTAParser(filepath)
+def filter_example(filepath, type : str):
+    parser = None
+    if type.upper() == 'FASTA':
+        parser = FASTAParser(filepath)
+    else:
+        parser = FASTQParser(filepath)
     
     filtered = SequenceFilter.by_length(parser.parse(), min_length=100, max_length=500)
     print("-- Filter Example --")
@@ -98,10 +102,10 @@ def filter_example(filepath):
 
 def main():
     """Main entry point for examples"""
-    example = 'test.fasta'
+    example = 'test.fastq'
     
-    analyze_fasta(example)
-    filter_example(example)
+    analyze_fastq(example)
+    filter_example(example, example.partition('.')[2])
 
 
 if __name__ == "__main__":
