@@ -58,6 +58,5 @@ class FASTQParser:
                 sequence = sequence_line,
                 quality = quality_line
             )
-                
-                    
+                      
                 
