@@ -88,7 +88,7 @@ def filter(fasta, min_length, max_length, min_gc, max_gc, output):
     parser = FASTAParser(fasta)
     
     
-    sequences = list(parser.parse)
+    sequences = list(parser.parse())
     sequences = SequenceFilters.by_length(sequences, min_length, max_length)
     sequences = SequenceFilters.by_gc_content(sequences, min_gc, max_gc)
     
@@ -107,4 +107,86 @@ def filter(fasta, min_length, max_length, min_gc, max_gc, output):
     
  
 @cli.command()
-@click.option('--fastq', type=click.Path(exists=True)
+@click.option('--fastq', type=click.Path(exists=True), required=True, help='FASTQ file to trim')
+@click.option('--quality', type=int, default=20, help='Minimum quality threshold')
+@click.option('--side', type=click.Choice(['left','right','both']), default='right', help='Which end to trim')
+@click.option('--output', type=click.Path(), help='Output file (optional)')
+def trim(fastq, quality, side, output):
+    """Trim low quality bases from FASTQ sequences"""
+    
+    click.echo(f"-- Trimming: {fastq} --")
+    click.echo(f"Quality Threshold: {quality}, Side: {side}")
+    
+    parser = FASTQParser(fastq)
+    sequences = list(parser.parse())
+    
+    trimmedCount = 0
+    totalBefore = 0
+    totalAfter = 0
+    
+    for seq in sequences:
+        totalBefore += seq.length
+        trimmed =  SequenceTrimmer.trim_quality(seq, quality, side)
+        totalAfter += trimmed.length
+        trimmedCount += 1
+        if seq.length != trimmed.length:
+            click.echo(f"{trimmed.identifier}: {seq.length}bp -> {trimmed.length}")
+    
+    
+    click.echo(f"\n Trimmed {trimmed_count} sequences")
+    click.echo(f"  Total bases: {total_before} -> {total_after} ({100*total_after/total_before:.1f}%)")
+    
+    if output:
+        # TODO write to file
+        
+        
+
+@cli.command()
+@click.option('--fasta', type=click.Path(exists=True), help='FASTA file')
+@click.option('--fastq', type=click.Path(exists=True), help='FASTQ file')
+@click.option('--k', type=int, default=3, help='Size of k-mers')
+@click.option('--top',type=int, default=10, help='Show top N k-mers')
+def kmer(fasta, fastq, k, top):
+    """Analyze k-mers frequencies in sequences"""
+    
+    if not fasta and not fastq:
+        click.echo("Error: Provide either --fasta or --fastq", err=True)
+    
+    if fasta:
+        click.echo(f"-- K-mer analysis: {fasta} --")
+    else:
+        click.echo(f" K = {k}, Top {top} k-mers \n")
+     
+    # TODO implement K-mer 
+        
+
+
+@cli.command()
+@click.option('--fasta', type=click.Path(exists=True), help='FASTA file')
+@click.option('--fastq', type=click.Path(exists=Tru)e, help='FASTQ file')
+def info(fasta, fastq):
+    """Show quick info about a sequence file"""
+    
+    if not fasta and not fastq:
+        click.echo("Error: Provide either --fasta or --fastq", err=True)
+    
+    if fasta:
+        parser = FASTAParser(fasta)
+        seqs = list(parser.parse())
+        click.echo(f" FASTA File: {fasta}")
+        
+    elif fastq:
+        parser = FASTQParser(fastq)
+        seqs = list(parser.parse())
+        click.echo(f" FASTQ File: {fastq}")
+    
+    click.echo(f"   Sequences: {len(seqs)}")
+    
+    if seqs:
+        lengths = [s.length for s in seqs]
+        click.echo(f"   Length range: {min(lengths)}-{max(lengths)}bp")
+        click.echo(f"   First seq: {seqs[0].identifier} ({seqs[0].length}bp)")
+
+
+if __name__ == '__main__':
+    cli()
