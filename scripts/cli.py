@@ -1,22 +1,22 @@
 """A command line interface to use the FASTA/FASTQ reader using Click"""
 
-import Click
+import click
 from fastq_parser import FASTQParser
 from fasta_parser import FASTAParser
 from stats import SequenceStats
-from filters import SequenceFilters
+from filters import SequenceFilter
 from trimmer import SequenceTrimmer
 
 @click.group
 def cli():
     """FASTA/FASTQ sequence analysis and processing tool"""
-    pass:
+    pass
 
 
 @cli.command()
 @click.option('--fasta', type=click.Path(exists=True), help='FASTA file to analyze')
 @click.option('--fastq', type=click.Path(exists=True), help='FASTQ file to analyze')
-@click.option('--stats', multiple=True, default=['length','gc'], type=.click.Choice(['length','gc','composition','quality']), help='Statistics to calculate')
+@click.option('--stats', multiple=True, default=['length','gc'], type=click.Choice(['length','gc','composition','quality']), help='Statistics to calculate')
 def analyze(fasta, fastq, stats):
     """Analyze a FASTA or FASTQ file"""
     
@@ -26,12 +26,12 @@ def analyze(fasta, fastq, stats):
     
     if fasta:
         click.echo(f" Analyzing FASTA: {fasta}\n")
-        parser = fasta_parser(fasta)
+        parser = FASTAParser(fasta)
         sequences = list(parser.parse())
         file_type = 'FASTA'
     else: 
         click.echo(f" Analyzing FASTQ: {fastq}\n")
-        parser = fastq_parser(fastq)
+        parser = FASTQParser(fastq)
         sequences = list(parser.parse())
         file_type = 'FASTQ'
     
@@ -39,7 +39,7 @@ def analyze(fasta, fastq, stats):
     
     
     for stat in stats:
-        if stat = 'length':
+        if stat == 'length':
             result = SequenceStats.length_stats(sequences)
             click.echo("-- Length Statistics --")
             click.echo(f" Min: {result['min']:.4f}")
@@ -48,7 +48,7 @@ def analyze(fasta, fastq, stats):
             click.echo(f" Median: {result['median']:.4f}")
             click.echo(f" Stdev: {result['stdev']:.4f}\n")
             
-        elif stat = 'gc':
+        elif stat == 'gc':
             result = SequenceStats.gc_content_stats(sequences)
             click.echo("-- GC Content Statistics --")
             click.echo(f" Min: {result['min']:.4f}")
@@ -56,7 +56,7 @@ def analyze(fasta, fastq, stats):
             click.echo(f" Mean: {result['mean']:.4f}")
             click.echo(f" Median: {result['median']:.4f}\n")
         
-        elif stat = 'composition':
+        elif stat == 'composition':
             result = SequenceStats.composition_stats(sequences)
             click.echo("-- Composition --")
 
@@ -66,8 +66,8 @@ def analyze(fasta, fastq, stats):
             click.echo()
         
         
-        elif stat = 'quality':
-            result = SequenceStats.composition_stats(sequences)
+        elif stat == 'quality':
+            result = SequenceStats.quality_stats(sequences)
             click.echo("-- Quality Statistics --")
             click.echo(f" Min: {result['min_quality']:.4f}")
             click.echo(f" Max: {result['max_quality']:.4f}")
@@ -89,8 +89,8 @@ def filter(fasta, min_length, max_length, min_gc, max_gc, output):
     
     
     sequences = list(parser.parse())
-    sequences = SequenceFilters.by_length(sequences, min_length, max_length)
-    sequences = SequenceFilters.by_gc_content(sequences, min_gc, max_gc)
+    sequences = SequenceFilter.by_length(sequences, min_length, max_length)
+    sequences = SequenceFilter.by_gc_content(sequences, min_gc, max_gc)
     
     count = 0
     for seq in sequences:
@@ -133,11 +133,10 @@ def trim(fastq, quality, side, output):
             click.echo(f"{trimmed.identifier}: {seq.length}bp -> {trimmed.length}")
     
     
-    click.echo(f"\n Trimmed {trimmed_count} sequences")
-    click.echo(f"  Total bases: {total_before} -> {total_after} ({100*total_after/total_before:.1f}%)")
+    click.echo(f"\n Trimmed {trimmedCount} sequences")
+    click.echo(f"  Total bases: {totalBefore} -> {totalAfter} ({100*totalAfter/totalBefore:.1f}%)")
     
-    if output:
-        # TODO write to file
+    # TODO write to file
         
         
 
@@ -163,7 +162,7 @@ def kmer(fasta, fastq, k, top):
 
 @cli.command()
 @click.option('--fasta', type=click.Path(exists=True), help='FASTA file')
-@click.option('--fastq', type=click.Path(exists=Tru)e, help='FASTQ file')
+@click.option('--fastq', type=click.Path(exists=True), help='FASTQ file')
 def info(fasta, fastq):
     """Show quick info about a sequence file"""
     
