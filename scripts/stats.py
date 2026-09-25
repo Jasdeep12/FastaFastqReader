@@ -68,6 +68,9 @@ class SequenceStats:
             qc_stats.append(qc_score)
         
         all_scores = [score for scores in qc_stats for score in scores]
+
+        if not all_scores:
+            raise ValueError("No quality scores found in the sequences")
         
         return {
             'count' : len(qc_stats),

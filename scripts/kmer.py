@@ -25,7 +25,7 @@ class KmerAnalyzer:
         
         for seq in sequences:
             string = seq.sequence
-            kmers.update(_sliding_window(string,k))
+            kmers.update(KmerAnalyzer._sliding_window(string,k))
         
         return kmers
        
@@ -33,41 +33,39 @@ class KmerAnalyzer:
     def N_most_common(sequences: list[Sequence], k : int, top_n : int):
         """Return the top N most common kmers"""
         
-        kmers = count_kmers(sequences,k)
+        kmers = KmerAnalyzer.count_kmers(sequences,k)
         
         return kmers.most_common(top_n)
     
     @staticmethod
-    def kmer_gc_content(kmer: string):
+    def kmer_gc_content(kmer: str):
         """Returns the GC content of a given kmer"""
         
         if not kmer:
-            raise ValueError("kmer is empty)
+            raise ValueError("kmer is empty")
          
         length = len(kmer)
         count = 0.0
         
         for i in kmer:
-            if i.upper() is in ['G','C']:
+            if i.upper() in ['G','C']:
                 count += 1
         
         
-        return round(float(length)/count, 4)
+        return round(count/length, 4)
     
     @staticmethod
     def find_rare_kmers(sequences, k , count):
         """Returns the least common kmers"""
-        kmers = count_kmers(sequences,k)
+        kmers = KmerAnalyzer.count_kmers(sequences,k)
         
-        return kmer.most_common()[:-n-1:-1]
+        return kmers.most_common()[:-count-1:-1]
         
         
-    @staticmethodd
+    @staticmethod
     def kmer_diversity(sequences, k):
+        """Returns the diversity of kmers in a sequence"""
+        kmers = KmerAnalyzer.count_kmers(sequences,k)
         
-        
-            
-                
-                
-                
-                
+        return len(kmers)
+    
