@@ -10,6 +10,8 @@ class SequenceFilter:
     @staticmethod
     def by_length(sequences: Iterator[Sequence], min_length: int = 0, max_length: int = float('inf')) -> Iterator[Sequence]:
         """Filter Sequences based by length range"""
+        if sequences is None:
+            raise ValueError("Sequences is None")
         if min_length is None:
             min_length = 0
         if max_length is None:
@@ -23,6 +25,8 @@ class SequenceFilter:
     @staticmethod
     def by_gc_content(sequences: Iterator[Sequence], min_gc : float = 0.0, max_gc : float = 1.0) -> Iterator[Sequence]:
         """Filter Sequences based on GC content"""
+        if sequences is None:
+            raise ValueError("Sequences is None")
 
         if min_gc is None:
             min_gc = 0.0
@@ -38,7 +42,11 @@ class SequenceFilter:
     @staticmethod
     def by_quality(sequences: Iterator[Sequence], min_avg_quality: int = 0) -> Iterator[Sequence]:
         """Filters Sequences based on quality"""
-       
+        if sequences is None:
+            raise ValueError("Sequences is None")
+
+        if min_avg_quality is None:
+            min_avg_quality = 0
            
         for seq in sequences:
             
@@ -58,6 +66,8 @@ class SequenceFilter:
     @staticmethod
     def custom(sequences: Iterator[Sequence], predicate: Callable[[Sequence], bool]) -> Iterator[Sequence]:
         """Filter using a custom predicate function"""
+        if sequences is None:
+            raise ValueError("Sequences is None")
         
         for seq in sequences:
             if predicate(seq):
