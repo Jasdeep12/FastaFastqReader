@@ -14,6 +14,7 @@ class FASTQParser:
     def __init__(self, filepath:str):
         "initialize parser with a FASTQ file path."
         
+        
         self.reader = FileReader(filepath)
         
     def parse(self) -> Iterator[Sequence]:
