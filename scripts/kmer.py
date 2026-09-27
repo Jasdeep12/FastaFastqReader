@@ -20,6 +20,8 @@ class KmerAnalyzer:
         """Counts k-mers per sequence for all sequences and keeps them in a dictionary"""
         if not sequences:
             raise ValueError("Sequences are empty")
+        if k <= 0:
+            raise ValueError("k must be a positive integer")
         
         kmers = Counter()
         
@@ -32,31 +34,18 @@ class KmerAnalyzer:
     @staticmethod
     def N_most_common(sequences: list[Sequence], k : int, top_n : int):
         """Return the top N most common kmers"""
+        if top_n <= 0:
+            raise ValueError("Top n must be a positive integer")
         
         kmers = KmerAnalyzer.count_kmers(sequences,k)
         
         return kmers.most_common(top_n)
-    
-    @staticmethod
-    def kmer_gc_content(kmer: str):
-        """Returns the GC content of a given kmer"""
         
-        if not kmer:
-            raise ValueError("kmer is empty")
-         
-        length = len(kmer)
-        count = 0.0
-        
-        for i in kmer:
-            if i.upper() in ['G','C']:
-                count += 1
-        
-        
-        return round(count/length, 4)
-    
     @staticmethod
     def find_rare_kmers(sequences, k , count):
         """Returns the least common kmers"""
+        if count <= 0:
+            raise ValueError("count must be a positive integer")
         kmers = KmerAnalyzer.count_kmers(sequences,k)
         
         return kmers.most_common()[:-count-1:-1]
