@@ -1,6 +1,8 @@
 import sys
 from pathlib import Path
 import pytest
+from click.testing import CliRunner
+
 
 TEST_DIR = Path(__file__).resolve().parent
 sys.path.append(str(TEST_DIR.parent))
@@ -10,6 +12,7 @@ from reader import FileReader
 from sequence import Sequence
 from fasta_parser import FASTAParser
 from fastq_parser import FASTQParser
+from cli import cli, format_record
 
 
 def test_fastq_parser():
@@ -34,3 +37,26 @@ def test_fasta_parser():
     assert sequences[1].header == "Test_2"
     assert sequences[1].sequence == "TTTCGCAACGGCGTGATACCATCATC"
 
+def test_fasta_roundtrip(tmp_path):
+    original = list(FASTAParser(DATA_DIR / "test.fasta").parse())
+    out = tmp_path / "rt.fasta"
+    out.write_text("".join(format_record(s, "FASTA") for s in original))
+    again = list(FASTAParser(out).parse())
+    assert [(s.header, s.sequence) for s in again] == \
+           [(s.header, s.sequence) for s in original]
+
+
+def test_fastq_roundtrip(tmp_path):
+    original = list(FASTQParser(DATA_DIR / "test.fastq").parse())
+    out = tmp_path / "rt.fastq"
+    out.write_text("".join(format_record(s, "FASTQ") for s in original))
+    again = list(FASTQParser(out).parse())
+    assert [(s.header, s.sequence, s.quality) for s in again] == \
+           [(s.header, s.sequence, s.quality) for s in original]
+
+
+def test_quality_stats_on_fasta_is_usage_error():
+    r = CliRunner().invoke(cli, ["analyze", "--fasta", str(DATA_DIR / "test.fasta"),
+                                 "--stats", "quality"])
+    assert r.exit_code == 2
+    assert "Error: Error:" not in r.output

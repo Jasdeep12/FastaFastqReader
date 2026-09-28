@@ -36,7 +36,7 @@ def format_record(seq, file_type):
     if file_type == "FASTA":
         return f">{seq.header}\n{seq.sequence}\n"
     else:
-        return f"{seq.header}\n{seq.sequence}\n+\n{seq.quality}\n"
+        return f"@{seq.header}\n{seq.sequence}\n+\n{seq.quality}\n"
 
 def open_output(output):
     """Opens the output file, or a no-op context if no output was requested."""
@@ -59,7 +59,7 @@ def analyze(fasta, fastq, stats):
     """Analyze a FASTA or FASTQ file"""
     parser, file_type, path = resolve_input(fasta, fastq)
     if file_type == "FASTA" and 'quality' in stats:
-        raise click.UsageError("Error: Quality statistics are only available for FASTQ files")
+        raise click.UsageError("Quality statistics are only available for FASTQ files")
     
     sequences = list(parser.parse())
     click.echo(f"--Analyzing {file_type}: {path}\n")
@@ -118,8 +118,8 @@ def filter_cmd(fastq, fasta, min_length, max_length, min_gc, max_gc, min_quality
     """Filter sequences by length and gc content"""
 
     parser, file_type, path = resolve_input(fasta,fastq)
-    if file_type == "FASTA" and min_quality:
-        raise click.UsageError("Error: Minimum quality available only with FASTQ files")   
+    if file_type == "FASTA" and min_quality is not None:
+        raise click.UsageError("Minimum quality available only with FASTQ files")   
     check_range("length",min_length,max_length)
     check_range("gc", min_gc, max_gc)
 
@@ -145,7 +145,7 @@ def filter_cmd(fastq, fasta, min_length, max_length, min_gc, max_gc, min_quality
     with open_output(output) as out:
         for seq in sequences:
             count += 1
-            click.echo(f"{seq.identifier}, {seq.length}bp, GC={seq.gc_content:.2%}")
+            click.echo(f"{seq.header}, {seq.length}bp, GC={seq.gc_content:.2%}")
             if out:
                 out.write(format_record(seq,file_type))
 
@@ -162,7 +162,7 @@ def filter_cmd(fastq, fasta, min_length, max_length, min_gc, max_gc, min_quality
 def trim(fastq, quality, side, output):
     """Trim low quality bases from FASTQ sequences"""
     if not fastq:
-        raise click.ClickException("Error: Provide a FASTQ file with --fastq")
+        raise click.ClickException("Provide a FASTQ file with --fastq")
 
     processed = trimmed_count = bases_before = bases_after = 0
 
@@ -180,7 +180,7 @@ def trim(fastq, quality, side, output):
             if seq.length == 0:
                 click.echo(f"{seq.header}: empty sequence, passed through unchanged")
 
-                result = 0
+                result = seq
             else:
                 result = SequenceTrimmer.trim_quality(seq,quality,side)
                 bases_before += seq.length
@@ -204,8 +204,8 @@ def trim(fastq, quality, side, output):
 @click.option('--fasta', type=click.Path(exists=True, dir_okay=False), help='FASTA file')
 @click.option('--fastq', type=click.Path(exists=True, dir_okay=False), help='FASTQ file')
 @click.option('--k', type=click.IntRange(min=1), default=3, show_default=True, help='Size of k-mers')
-@click.option('--top',type=int, default=10, show_default=True, help='Show top N k-mers')
-@click.option('--rare', type=int, default=0, show_default=True, help='Show rare N k-mers (0 = off)')
+@click.option('--top',type=click.IntRange(min=1), default=10, show_default=True, help='Show top N k-mers')
+@click.option('--rare', type=click.IntRange(min=0), default=0, show_default=True, help='Show rare N k-mers (0 = off)')
 @click.option('--diversity', is_flag=True, help='Show k-mer diversity')
 def kmer(fasta, fastq, k, top, rare, diversity):
     """Analyze k-mers frequencies in sequences"""
@@ -254,7 +254,7 @@ def info(fasta, fastq):
     click.echo(f"  Sequences: {count}")
     if first is not None:
         click.echo(f"  Length range: {min_len}-{max_len}bp")
-        click.echo(f"  First seq: {first.identifier} ({first.length}bp)")
+        click.echo(f"  First seq: {first.header} ({first.length}bp)")
  
 
 
