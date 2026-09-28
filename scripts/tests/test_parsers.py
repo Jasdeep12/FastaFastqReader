@@ -23,6 +23,7 @@ def test_fastq_parser():
     assert sequences[1].header == "seq2"
     assert sequences[1].sequence == "CGATCGAT"
     assert sequences[1].quality == "#<<A4FFF"
+
 def test_fasta_parser():
     fasta_file = DATA_DIR / "test.fasta"
     parser = FASTAParser(fasta_file)
