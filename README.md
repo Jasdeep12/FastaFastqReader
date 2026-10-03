@@ -1,4 +1,4 @@
-# fastaReader
+# fastafastqReader
 
 **A dependency-light Python toolkit and CLI for parsing, summarizing, filtering, quality-trimming, and k-mer profiling FASTA/FASTQ files.**
 
@@ -7,7 +7,7 @@ Built from scratch (no Biopython) to understand the formats end to end: streamin
 ## Overview
 
 ```text
-$ fastareader analyze --fasta tests/test_data/.fasta --stats length --stats gc 
+$ python scripts/cli.py analyze --fasta tests/test_data/.fasta --stats length --stats gc 
 ```
 
 ```text
@@ -90,7 +90,7 @@ python scripts/cli.py kmer --fasta genome.fasta --k 5 --top 10 --rare 5 --divers
 ## Project structure
 
 ```text
-fastaReader-Project/scripts
+fastafastqreader/scripts
 ├── cli.py            # Click CLI
 ├── reader.py         # Base file reader
 ├── sequence.py       # Sequence record (header, sequence, quality, GC, length)
